@@ -207,7 +207,7 @@ const QUIZ_QUESTIONS = {
   },
   grammar: () => {
     const all = GRAMMAR.flatMap(g => g.questions.map(q => ({
-      question: q.sentence.replace('___', '___'),
+      question: q.sentence,
       correct: q.answer,
       options: q.options
     })));
@@ -296,9 +296,10 @@ function renderHome() {
 // ==================== VOCABULARY ====================
 function renderVocabulary() {
   const tabs = document.getElementById('cat-tabs');
-  tabs.innerHTML = Object.keys(VOCABULARY).map(cat =>
-    `<button class="cat-tab ${cat === state.vocab.category ? 'active' : ''}" onclick="selectCategory('${cat}')">${cat}</button>`
-  ).join('');
+  tabs.innerHTML = Object.keys(VOCABULARY).map(cat => {
+    const safeAttr = cat.replace(/&/g, '&amp;').replace(/'/g, '&#39;');
+    return `<button class="cat-tab ${cat === state.vocab.category ? 'active' : ''}" onclick="selectCategory('${safeAttr}')">${cat}</button>`;
+  }).join('');
   renderCard();
   renderWordList();
 }
@@ -344,9 +345,7 @@ function markCard(level) {
   const words = VOCABULARY[state.vocab.category];
   const w = words[state.vocab.cardIndex];
   state.vocab.marks[w.en] = level;
-  if (level === 'easy') {
-    state.stats.wordsLearned = Object.values(state.vocab.marks).filter(m => m === 'easy').length;
-  }
+  state.stats.wordsLearned = Object.values(state.vocab.marks).filter(m => m === 'easy').length;
   saveState();
   renderWordList();
   nextCard();
@@ -400,9 +399,7 @@ function openGrammar(id) {
       </select>
       <div class="answer-feedback" id="fb-${i}"></div>
     </div>`
-  ).join('');
-
-  content.innerHTML += `<button class="check-btn" onclick="checkGrammar('${id}')">Cevapları Kontrol Et</button>
+  ).join('') + `<button class="check-btn" id="check-btn-${id}" onclick="checkGrammar('${id}')">Cevapları Kontrol Et</button>
     <div class="grammar-result" id="grammar-result"></div>`;
 }
 
@@ -412,6 +409,7 @@ function checkGrammar(id) {
   topic.questions.forEach((q, i) => {
     const sel = document.getElementById(`sel-${i}`);
     const fb = document.getElementById(`fb-${i}`);
+    sel.disabled = true;
     fb.style.display = 'block';
     if (sel.value === q.answer) {
       correct++;
@@ -422,6 +420,8 @@ function checkGrammar(id) {
       fb.className = 'answer-feedback wrong';
     }
   });
+  const checkBtn = document.getElementById(`check-btn-${id}`);
+  if (checkBtn) checkBtn.disabled = true;
   const result = document.getElementById('grammar-result');
   result.style.display = 'block';
   const pct = Math.round((correct / topic.questions.length) * 100);
