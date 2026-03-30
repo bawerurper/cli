@@ -122,6 +122,17 @@ h2 {
 .hero p {
   font-size: 1.1rem;
   color: var(--text2);
+  margin-bottom: 1rem;
+}
+
+.level-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  padding: 0.4rem 1.2rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
   margin-bottom: 2rem;
 }
 
