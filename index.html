@@ -13,6 +13,8 @@
       <button class="nav-btn active" data-section="home">Ana Sayfa</button>
       <button class="nav-btn" data-section="vocabulary">Kelimeler</button>
       <button class="nav-btn" data-section="grammar">Gramer</button>
+      <button class="nav-btn" data-section="writing">Yazma</button>
+      <button class="nav-btn" data-section="speaking">Konuşma</button>
       <button class="nav-btn" data-section="quiz">Quiz</button>
       <button class="nav-btn" data-section="progress">İlerleme</button>
     </nav>
@@ -46,12 +48,22 @@
         <div class="feature-card" onclick="goTo('vocabulary')">
           <div class="feature-icon">📚</div>
           <h3>Kelime Öğren</h3>
-          <p>Kategorilere göre düzenlenmiş yüzlerce kelime</p>
+          <p>18 kategori, 350+ kelime</p>
         </div>
         <div class="feature-card" onclick="goTo('grammar')">
           <div class="feature-icon">✏️</div>
-          <h3>Gramer Alıştırmaları</h3>
-          <p>Zamanlar, cümle yapıları ve daha fazlası</p>
+          <h3>Gramer</h3>
+          <p>15 konu, zamanlar ve yapılar</p>
+        </div>
+        <div class="feature-card" onclick="goTo('writing')">
+          <div class="feature-icon">📝</div>
+          <h3>Yazma Alıştırması</h3>
+          <p>E-posta, hikaye, hata düzeltme</p>
+        </div>
+        <div class="feature-card" onclick="goTo('speaking')">
+          <div class="feature-icon">🗣️</div>
+          <h3>Konuşma Pratiği</h3>
+          <p>Diyalog, telaffuz, rol yapma</p>
         </div>
         <div class="feature-card" onclick="goTo('quiz')">
           <div class="feature-icon">🧠</div>
@@ -101,6 +113,30 @@
         <h3 id="exercise-title"></h3>
         <p class="exercise-desc" id="exercise-desc"></p>
         <div id="exercise-content"></div>
+      </div>
+    </section>
+
+    <!-- WRITING -->
+    <section id="writing" class="section">
+      <h2>Yazma Alıştırması</h2>
+      <div class="writing-topics" id="writing-topics"></div>
+      <div class="writing-exercise" id="writing-exercise" style="display:none;">
+        <button class="btn-back" onclick="backToWritingTopics()">← Konulara Dön</button>
+        <h3 id="writing-ex-title"></h3>
+        <p class="exercise-desc" id="writing-ex-desc"></p>
+        <div id="writing-ex-content"></div>
+      </div>
+    </section>
+
+    <!-- SPEAKING -->
+    <section id="speaking" class="section">
+      <h2>Konuşma Pratiği</h2>
+      <div class="speaking-topics" id="speaking-topics"></div>
+      <div class="speaking-exercise" id="speaking-exercise" style="display:none;">
+        <button class="btn-back" onclick="backToSpeakingTopics()">← Konulara Dön</button>
+        <h3 id="speaking-ex-title"></h3>
+        <p class="exercise-desc" id="speaking-ex-desc"></p>
+        <div id="speaking-ex-content"></div>
       </div>
     </section>
 

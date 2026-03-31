@@ -277,6 +277,8 @@ function goTo(section) {
   if (section === 'home') renderHome();
   if (section === 'vocabulary') renderVocabulary();
   if (section === 'grammar') renderGrammarTopics();
+  if (section === 'writing') renderWritingTopics();
+  if (section === 'speaking') renderSpeakingTopics();
   if (section === 'progress') renderProgress();
 }
 
@@ -579,6 +581,363 @@ function renderProgress() {
     </div>`
   ).join('');
 }
+
+// ==================== WRITING ====================
+const WRITING = [
+  {
+    id: 'error-correction',
+    icon: '🔍',
+    title: 'Hata Düzeltme',
+    desc: 'Her cümlede bir yanlış kelime veya yapı var. Doğrusunu seç.',
+    questions: [
+      { sentence: 'She don\'t like coffee in the morning.', options: ['don\'t', 'doesn\'t', 'isn\'t', 'aren\'t'], answer: 'doesn\'t', context: 'She ___ like coffee in the morning.' },
+      { sentence: 'They was very tired after the trip.', options: ['was', 'were', 'are', 'be'], answer: 'were', context: 'They ___ very tired after the trip.' },
+      { sentence: 'I have seen him yesterday.', options: ['have seen', 'saw', 'see', 'seen'], answer: 'saw', context: 'I ___ him yesterday.' },
+      { sentence: 'He can to swim very well.', options: ['can to swim', 'can swim', 'could to swim', 'cans swim'], answer: 'can swim', context: 'He ___ very well.' },
+      { sentence: 'She is more tall than her sister.', options: ['more tall', 'taller', 'tallest', 'most tall'], answer: 'taller', context: 'She is ___ than her sister.' },
+      { sentence: 'I didn\'t went to the party last night.', options: ['didn\'t went', 'didn\'t go', 'don\'t go', 'wasn\'t go'], answer: 'didn\'t go', context: 'I ___ to the party last night.' },
+    ]
+  },
+  {
+    id: 'fill-blank',
+    icon: '✍️',
+    title: 'Boşluk Doldurma',
+    desc: 'Metindeki boşlukları doğru kelimelerle tamamla.',
+    questions: [
+      { sentence: 'I usually ___ breakfast at 7 am.', options: ['have', 'has', 'having', 'had'], answer: 'have' },
+      { sentence: 'She ___ been to London three times.', options: ['has', 'have', 'had', 'is'], answer: 'has' },
+      { sentence: 'If I ___ more time, I would study harder.', options: ['have', 'had', 'has', 'having'], answer: 'had' },
+      { sentence: 'The letter ___ written by my manager.', options: ['is', 'was', 'were', 'be'], answer: 'was' },
+      { sentence: 'He told me ___ he was feeling better.', options: ['what', 'that', 'which', 'who'], answer: 'that' },
+      { sentence: 'You should eat ___ sugar — it\'s bad for you.', options: ['too many', 'too much', 'enough', 'very'], answer: 'too much' },
+    ]
+  },
+  {
+    id: 'email-writing',
+    icon: '📧',
+    title: 'E-posta Yazma',
+    desc: 'Bir e-postanın boşluklarını doğru ifadelerle tamamla.',
+    questions: [
+      { sentence: 'Dear Sir/Madam, ___ writing to apply for the position.', options: ['I am', 'I be', 'I were', 'Am I'], answer: 'I am' },
+      { sentence: '___ your advertisement in the newspaper.', options: ['I saw', 'I see', 'I have see', 'Saw I'], answer: 'I saw' },
+      { sentence: 'I would ___ to arrange a meeting.', options: ['like', 'likes', 'liked', 'liking'], answer: 'like' },
+      { sentence: 'Please ___ me know if this is convenient.', options: ['let', 'leave', 'make', 'do'], answer: 'let' },
+      { sentence: 'I look ___ to hearing from you.', options: ['forward', 'ahead', 'front', 'after'], answer: 'forward' },
+      { sentence: '___ regards, John Smith.', options: ['Kind', 'Good', 'Best', 'Nice'], answer: 'Kind' },
+    ]
+  },
+  {
+    id: 'sentence-reorder',
+    icon: '🔀',
+    title: 'Cümle Düzenleme',
+    desc: 'Verilen kelime grubundan doğru cümleyi seç.',
+    questions: [
+      { sentence: 'Hangi sıralama doğru? (every / goes / she / morning / jogging)', options: ['She goes jogging every morning.', 'Every she goes morning jogging.', 'Jogging goes she every morning.', 'She morning goes every jogging.'], answer: 'She goes jogging every morning.' },
+      { sentence: 'Hangi sıralama doğru? (been / has / she / to / never / Paris)', options: ['She has never been to Paris.', 'Never she has been to Paris.', 'She never has been Paris to.', 'Has she never to Paris been.'], answer: 'She has never been to Paris.' },
+      { sentence: 'Hangi sıralama doğru? (I / be / will / tomorrow / late)', options: ['I will be late tomorrow.', 'I late will be tomorrow.', 'Will I be tomorrow late.', 'Tomorrow I late will be.'], answer: 'I will be late tomorrow.' },
+      { sentence: 'Hangi sıralama doğru? (the / was / built / bridge / 1990 / in)', options: ['The bridge was built in 1990.', 'In 1990 the built was bridge.', 'The built bridge was in 1990.', 'Was the bridge built 1990 in.'], answer: 'The bridge was built in 1990.' },
+      { sentence: 'Hangi sıralama doğru? (if / had / a car / I / drive / would / I)', options: ['If I had a car, I would drive.', 'I would drive if had I a car.', 'Had I a car if I would drive.', 'If I would have a car, I drive.'], answer: 'If I had a car, I would drive.' },
+    ]
+  },
+  {
+    id: 'paragraph',
+    icon: '📄',
+    title: 'Paragraf Tamamlama',
+    desc: 'Bağlaç ve geçiş ifadelerini doğru yere koy.',
+    questions: [
+      { sentence: 'I wanted to go to the gym. ___, I was too tired.', options: ['However', 'Therefore', 'Moreover', 'Because'], answer: 'However' },
+      { sentence: 'She studied hard. ___, she passed the exam.', options: ['As a result', 'However', 'Although', 'Unless'], answer: 'As a result' },
+      { sentence: 'I love cooking. ___, I enjoy baking cakes.', options: ['In addition', 'Despite', 'Although', 'Therefore'], answer: 'In addition' },
+      { sentence: '___ it was raining, we went for a walk.', options: ['Although', 'Because', 'Therefore', 'Moreover'], answer: 'Although' },
+      { sentence: 'The hotel was expensive. ___, the service was excellent.', options: ['Nevertheless', 'Because', 'So', 'Since'], answer: 'Nevertheless' },
+    ]
+  },
+];
+
+function renderWritingTopics() {
+  const container = document.getElementById('writing-topics');
+  container.style.display = 'grid';
+  document.getElementById('writing-exercise').style.display = 'none';
+  container.innerHTML = WRITING.map(w =>
+    `<div class="grammar-topic-card" onclick="openWriting('${w.id}')">
+      <div class="topic-icon">${w.icon}</div>
+      <h3>${w.title}</h3>
+      <p>${w.desc}</p>
+    </div>`
+  ).join('');
+}
+
+function openWriting(id) {
+  const topic = WRITING.find(w => w.id === id);
+  document.getElementById('writing-topics').style.display = 'none';
+  const ex = document.getElementById('writing-exercise');
+  ex.style.display = 'block';
+  document.getElementById('writing-ex-title').textContent = topic.icon + ' ' + topic.title;
+  document.getElementById('writing-ex-desc').textContent = topic.desc;
+
+  const content = document.getElementById('writing-ex-content');
+  content.innerHTML = topic.questions.map((q, i) =>
+    `<div class="exercise-item" id="wex-${i}">
+      <p>${q.context || q.sentence}</p>
+      <select id="wsel-${i}">
+        <option value="">-- Seç --</option>
+        ${q.options.map(o => `<option value="${o}">${o}</option>`).join('')}
+      </select>
+      <div class="answer-feedback" id="wfb-${i}"></div>
+    </div>`
+  ).join('') + `<button class="check-btn" id="wcheck-${id}" onclick="checkWriting('${id}')">Cevapları Kontrol Et</button>
+    <div class="grammar-result" id="writing-result"></div>`;
+}
+
+function checkWriting(id) {
+  const topic = WRITING.find(w => w.id === id);
+  let correct = 0;
+  topic.questions.forEach((q, i) => {
+    const sel = document.getElementById(`wsel-${i}`);
+    const fb = document.getElementById(`wfb-${i}`);
+    sel.disabled = true;
+    fb.style.display = 'block';
+    if (sel.value === q.answer) {
+      correct++;
+      fb.textContent = '✓ Doğru!';
+      fb.className = 'answer-feedback correct';
+    } else {
+      fb.textContent = `✗ Yanlış. Doğru cevap: "${q.answer}"`;
+      fb.className = 'answer-feedback wrong';
+    }
+  });
+  const btn = document.getElementById(`wcheck-${id}`);
+  if (btn) btn.disabled = true;
+  const result = document.getElementById('writing-result');
+  result.style.display = 'block';
+  const pct = Math.round((correct / topic.questions.length) * 100);
+  const emoji = pct >= 80 ? '🎉' : pct >= 60 ? '👍' : '📚';
+  result.textContent = `${emoji} ${correct}/${topic.questions.length} doğru (${pct}%) — ${pct >= 80 ? 'Harika!' : pct >= 60 ? 'İyi iş!' : 'Biraz daha çalış!'}`;
+}
+
+function backToWritingTopics() { renderWritingTopics(); }
+
+// ==================== SPEAKING ====================
+const SPEAKING = [
+  {
+    id: 'restaurant',
+    icon: '🍽️',
+    title: 'Restoranda',
+    desc: 'Restoranda geçen bir İngilizce diyalogu oku ve pratik yap.',
+    type: 'dialogue',
+    lines: [
+      { speaker: 'Waiter', text: 'Good evening! Do you have a reservation?' },
+      { speaker: 'Customer', text: 'Yes, I have a reservation for two under Smith.' },
+      { speaker: 'Waiter', text: 'Perfect. Please follow me to your table.' },
+      { speaker: 'Customer', text: 'Could we see the menu, please?' },
+      { speaker: 'Waiter', text: 'Of course! Here you are. Can I get you something to drink first?' },
+      { speaker: 'Customer', text: 'Yes, I\'ll have a glass of water, please.' },
+      { speaker: 'Waiter', text: 'Are you ready to order?' },
+      { speaker: 'Customer', text: 'I\'d like the grilled chicken, please.' },
+      { speaker: 'Waiter', text: 'Excellent choice! And for dessert?' },
+      { speaker: 'Customer', text: 'Could we have the bill, please?' },
+    ],
+    phrases: ['Do you have a reservation?', 'I\'d like...', 'Could we have the bill?', 'Are you ready to order?']
+  },
+  {
+    id: 'doctor',
+    icon: '🏥',
+    title: 'Doktorda',
+    desc: 'Doktor randevusunda kullanılan İngilizce ifadeler.',
+    type: 'dialogue',
+    lines: [
+      { speaker: 'Doctor', text: 'Good morning! What seems to be the problem?' },
+      { speaker: 'Patient', text: 'I\'ve had a terrible headache for two days.' },
+      { speaker: 'Doctor', text: 'I see. Do you have any other symptoms?' },
+      { speaker: 'Patient', text: 'Yes, I also have a fever and I feel very tired.' },
+      { speaker: 'Doctor', text: 'How long have you felt like this?' },
+      { speaker: 'Patient', text: 'Since Monday. I also have a sore throat.' },
+      { speaker: 'Doctor', text: 'Let me take your temperature. Open your mouth please.' },
+      { speaker: 'Patient', text: 'Is it serious, doctor?' },
+      { speaker: 'Doctor', text: 'No, it\'s just a flu. I\'ll prescribe some medication.' },
+      { speaker: 'Patient', text: 'Thank you. How many times a day should I take it?' },
+    ],
+    phrases: ['What seems to be the problem?', 'I\'ve had a headache.', 'Any other symptoms?', 'I\'ll prescribe...']
+  },
+  {
+    id: 'hotel',
+    icon: '🏨',
+    title: 'Otelde',
+    desc: 'Otele giriş ve çıkış için gerekli İngilizce ifadeler.',
+    type: 'dialogue',
+    lines: [
+      { speaker: 'Receptionist', text: 'Good afternoon! Welcome to Grand Hotel.' },
+      { speaker: 'Guest', text: 'Hello, I have a reservation. My name is Taylor.' },
+      { speaker: 'Receptionist', text: 'Let me check that for you. Yes, a double room for three nights?' },
+      { speaker: 'Guest', text: 'That\'s correct. Is breakfast included?' },
+      { speaker: 'Receptionist', text: 'Yes, breakfast is served from 7 to 10 am.' },
+      { speaker: 'Guest', text: 'What time is check-out?' },
+      { speaker: 'Receptionist', text: 'Check-out is at 11 am. Here is your key card.' },
+      { speaker: 'Guest', text: 'Is there a gym in the hotel?' },
+      { speaker: 'Receptionist', text: 'Yes, the gym is on the 3rd floor and is open 24 hours.' },
+      { speaker: 'Guest', text: 'Great, thank you very much!' },
+    ],
+    phrases: ['I have a reservation.', 'Is breakfast included?', 'What time is check-out?', 'Here is your key card.']
+  },
+  {
+    id: 'shopping',
+    icon: '🛍️',
+    title: 'Alışverişte',
+    desc: 'Mağazada alışveriş yaparken kullanılan ifadeler.',
+    type: 'dialogue',
+    lines: [
+      { speaker: 'Assistant', text: 'Hi there! Can I help you?' },
+      { speaker: 'Customer', text: 'Yes, I\'m looking for a jacket.' },
+      { speaker: 'Assistant', text: 'What size are you?' },
+      { speaker: 'Customer', text: 'I\'m a medium. Do you have this in blue?' },
+      { speaker: 'Assistant', text: 'Let me check in the back. Yes, we have it in blue!' },
+      { speaker: 'Customer', text: 'Can I try it on?' },
+      { speaker: 'Assistant', text: 'Of course! The fitting room is over there.' },
+      { speaker: 'Customer', text: 'I\'ll take it. How much is it?' },
+      { speaker: 'Assistant', text: 'It\'s £45. We also have a 20% discount today.' },
+      { speaker: 'Customer', text: 'That\'s great! Can I pay by card?' },
+    ],
+    phrases: ['Can I help you?', 'I\'m looking for...', 'Can I try it on?', 'How much is it?']
+  },
+  {
+    id: 'directions',
+    icon: '🗺️',
+    title: 'Yön Tarifi',
+    desc: 'Yol tarif etme ve sormak için İngilizce ifadeler.',
+    type: 'dialogue',
+    lines: [
+      { speaker: 'Person A', text: 'Excuse me, could you help me?' },
+      { speaker: 'Person B', text: 'Of course, what do you need?' },
+      { speaker: 'Person A', text: 'I\'m looking for the train station. Am I going the right way?' },
+      { speaker: 'Person B', text: 'No, you\'re going in the wrong direction.' },
+      { speaker: 'Person A', text: 'Oh no! How do I get there from here?' },
+      { speaker: 'Person B', text: 'Turn left at the traffic lights, then go straight ahead.' },
+      { speaker: 'Person A', text: 'Is it far from here?' },
+      { speaker: 'Person B', text: 'No, it\'s about a 10-minute walk.' },
+      { speaker: 'Person A', text: 'And is there a bus I can take?' },
+      { speaker: 'Person B', text: 'Yes, take the number 5 bus. It stops right outside.' },
+    ],
+    phrases: ['Could you help me?', 'Turn left/right.', 'Go straight ahead.', 'How far is it?']
+  },
+  {
+    id: 'job-interview',
+    icon: '💼',
+    title: 'İş Görüşmesi',
+    desc: 'İş görüşmesinde kullanılan temel İngilizce ifadeler.',
+    type: 'dialogue',
+    lines: [
+      { speaker: 'Interviewer', text: 'Good morning! Please, have a seat.' },
+      { speaker: 'Candidate', text: 'Good morning. Thank you for seeing me.' },
+      { speaker: 'Interviewer', text: 'So, tell me a little about yourself.' },
+      { speaker: 'Candidate', text: 'I have 3 years of experience in marketing and I\'m a team player.' },
+      { speaker: 'Interviewer', text: 'Why do you want to work for our company?' },
+      { speaker: 'Candidate', text: 'I admire your company\'s values and I believe I can contribute.' },
+      { speaker: 'Interviewer', text: 'What are your strengths?' },
+      { speaker: 'Candidate', text: 'I\'m very organised and I work well under pressure.' },
+      { speaker: 'Interviewer', text: 'Do you have any questions for us?' },
+      { speaker: 'Candidate', text: 'Yes, what are the opportunities for career development?' },
+    ],
+    phrases: ['Tell me about yourself.', 'I have experience in...', 'Why do you want to work here?', 'What are your strengths?']
+  },
+  {
+    id: 'pronunciation',
+    icon: '🔊',
+    title: 'Telaffuz Rehberi',
+    desc: 'Türk öğrencilerin zorlandığı İngilizce sesler ve örnekler.',
+    type: 'pronunciation',
+    sounds: [
+      { sound: 'th (sesli)', ipa: '/ð/', words: ['the', 'this', 'that', 'there', 'they'], tip: 'Dilinizi üst dişlerinize hafifçe değdirin, ses çıkarın.' },
+      { sound: 'th (sessiz)', ipa: '/θ/', words: ['think', 'three', 'thank', 'Thursday', 'tooth'], tip: 'Dilinizi üst dişlerinize değdirin, nefes verin.' },
+      { sound: 'w', ipa: '/w/', words: ['water', 'work', 'week', 'window', 'world'], tip: 'Dudaklarınızı yuvarlayın, "v" değil "u" gibi başlayın.' },
+      { sound: 'v', ipa: '/v/', words: ['visit', 'very', 'village', 'voice', 'over'], tip: 'Üst dişlerinizi alt dudağınıza değdirin.' },
+      { sound: 'r', ipa: '/r/', words: ['red', 'right', 'road', 'round', 'river'], tip: 'Türkçe "r"den farklı — dilinizi yukarı kaldırmayın.' },
+      { sound: 'ı (kısa)', ipa: '/ɪ/', words: ['sit', 'big', 'trip', 'quick', 'list'], tip: 'Kısa "i" sesi — ağzı çok açmadan söyleyin.' },
+    ]
+  },
+  {
+    id: 'making-plans',
+    icon: '📅',
+    title: 'Plan Yapma',
+    desc: 'Arkadaşlarla plan yaparken kullanılan İngilizce ifadeler.',
+    type: 'dialogue',
+    lines: [
+      { speaker: 'Alex', text: 'Hey! Are you free this weekend?' },
+      { speaker: 'Sam', text: 'I think so. What did you have in mind?' },
+      { speaker: 'Alex', text: 'I was thinking we could go to the cinema.' },
+      { speaker: 'Sam', text: 'That sounds great! What\'s on?' },
+      { speaker: 'Alex', text: 'There\'s a new action film. It starts at 7 pm.' },
+      { speaker: 'Sam', text: 'Perfect. Shall we meet outside the cinema at 6:45?' },
+      { speaker: 'Alex', text: 'Sure! Don\'t forget to book the tickets online.' },
+      { speaker: 'Sam', text: 'Good idea. I\'ll do it now. How many tickets do we need?' },
+      { speaker: 'Alex', text: 'Just two. Do you want to get dinner before the film?' },
+      { speaker: 'Sam', text: 'Absolutely! Let\'s meet at 6 then.' },
+    ],
+    phrases: ['Are you free?', 'What did you have in mind?', 'That sounds great!', 'Shall we meet at...?']
+  },
+];
+
+function renderSpeakingTopics() {
+  const container = document.getElementById('speaking-topics');
+  container.style.display = 'grid';
+  document.getElementById('speaking-exercise').style.display = 'none';
+  container.innerHTML = SPEAKING.map(s =>
+    `<div class="grammar-topic-card" onclick="openSpeaking('${s.id}')">
+      <div class="topic-icon">${s.icon}</div>
+      <h3>${s.title}</h3>
+      <p>${s.desc}</p>
+    </div>`
+  ).join('');
+}
+
+function openSpeaking(id) {
+  const topic = SPEAKING.find(s => s.id === id);
+  document.getElementById('speaking-topics').style.display = 'none';
+  const ex = document.getElementById('speaking-exercise');
+  ex.style.display = 'block';
+  document.getElementById('speaking-ex-title').textContent = topic.icon + ' ' + topic.title;
+  document.getElementById('speaking-ex-desc').textContent = topic.desc;
+
+  const content = document.getElementById('speaking-ex-content');
+
+  if (topic.type === 'pronunciation') {
+    content.innerHTML = topic.sounds.map(s =>
+      `<div class="pronunciation-card">
+        <div class="pron-header">
+          <span class="pron-sound">${s.sound}</span>
+          <span class="pron-ipa">${s.ipa}</span>
+        </div>
+        <div class="pron-words">${s.words.map(w => `<span class="pron-word">${w}</span>`).join('')}</div>
+        <p class="pron-tip">💡 ${s.tip}</p>
+      </div>`
+    ).join('');
+    return;
+  }
+
+  content.innerHTML = `
+    <div class="dialogue-hint">💡 Her satırı sesli okuyun. "B Rolü"nü gizleyerek pratik yapabilirsiniz.</div>
+    <button class="btn-secondary" style="margin-bottom:1rem;" onclick="toggleSpeakerB('${id}')">👁 B Rolünü Gizle/Göster</button>
+    <div class="dialogue-container" id="dialogue-${id}">
+      ${topic.lines.map((l, i) =>
+        `<div class="dialogue-line ${i % 2 === 0 ? 'line-a' : 'line-b'}">
+          <span class="dialogue-speaker">${l.speaker}</span>
+          <span class="dialogue-text">${l.text}</span>
+        </div>`
+      ).join('')}
+    </div>
+    <div class="key-phrases">
+      <h4>🔑 Anahtar İfadeler</h4>
+      <div class="phrases-list">
+        ${topic.phrases.map(p => `<span class="phrase-tag">"${p}"</span>`).join('')}
+      </div>
+    </div>`;
+}
+
+function toggleSpeakerB(id) {
+  const container = document.getElementById(`dialogue-${id}`);
+  container.querySelectorAll('.line-b').forEach(el => el.classList.toggle('hidden-line'));
+}
+
+function backToSpeakingTopics() { renderSpeakingTopics(); }
 
 // ==================== UTILS ====================
 function shuffle(arr) {
